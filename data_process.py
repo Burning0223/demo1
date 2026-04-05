@@ -38,7 +38,7 @@ def data_split(texts,keywords,labels,test_size=0.15,dev_size=0.15,random=42):
         texts,labels,test_size=test_size+dev_size,random_state=random,stratify=labels
     )
     x_dev,x_test,y_dev,y_test=train_test_split(
-        x_temp,y_temp,test_size=test_size,random_state=random,stratify=y_temp
+        x_temp,y_temp,test_size=0.5,random_state=random,stratify=y_temp
     )
     keywords_train=keywords[:len(x_train)]
     keywords_dev=keywords[len(x_train):len(x_train)+len(x_dev)]

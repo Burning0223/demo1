@@ -1,4 +1,4 @@
-model_name="E:/bert_test/bert-base-uncased"
+model_name="bert-base-uncased"
 max_length=128
 num_epochs=10
 batch_size=16

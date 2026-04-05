@@ -48,9 +48,5 @@ class EarlyStopping:
         torch.save(checkpoint,self.path)
         print(f"保存epoch{epoch+1}的checkpoint")
 
-    def load_best_model(self,model):
-        checkpoint=torch.load(self.path)
-        model.load_state_dict(checkpoint['model'])
-        return model
     
     

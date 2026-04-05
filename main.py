@@ -18,7 +18,7 @@ random_seed(42)
 
 def main():
     texts,keywords,labels=load_data('0.demo1文本分类/toutiao_cat_data.txt')
-    train_texts,train_keywords,train_labels,dev_texts,dev_keywords,dev_labels,test_texts,test_keywords,text_labels=data_split(
+    train_texts,train_keywords,train_labels,dev_texts,dev_keywords,dev_labels,test_texts,test_keywords,test_labels=data_split(
         texts,keywords,labels
     )
 

@@ -80,11 +80,6 @@ class Trainer():
         report=classification_report(all_labels,all_preds)
         return ave_loss,acc,report
 
-    def test(self,dataloader):
-        self.model=self.early_stopping.load_best_model(self.model)
-        return self.dev(dataloader)
-
-
     def train_with_early_stopping(self,train_dataloader,dev_dataloader):
         dev_best_acc=0
         for epoch in range(config.num_epochs):
