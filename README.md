@@ -23,12 +23,13 @@
 ``` 
 ├── config.py          # 配置类
 ├── model.py           # BERT 模型定义
-├── data_process.py    #数据预处理
+├── data_process.py    # 数据预处理
 ├── train.py           # 训练器
 ├── early_stopping.py  # 早停机制        
-├── main.py            #主程序
-├── requirements.txt  # 环境依赖
-└── README.md         # 项目说明
+├── main.py            # 主程序
+├── test.py            # 测试评估
+├── requirements.txt   # 环境依赖
+└── README.md          # 项目说明
 ``` 
 ## 环境依赖
 ``` 
