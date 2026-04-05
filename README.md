@@ -1,7 +1,7 @@
 # 新闻文本分类任务
 基于 bert-base-chinese模型，使用 PyTorch 和 Hugging Face ，完成文本分类任务的训练与评估。
 ## 数据集
-来源：https://github.com/aceimnorstuvwxz/toutiao-text-classfication-dataset来自今日头条客户端，共15个类别：
+来源：https://github.com/aceimnorstuvwxz/toutiao-text-classfication-dataset  来自今日头条客户端，共15个类别：
 ``` 
 100 民生 故事 news_story
 101 文化 文化 news_culture
