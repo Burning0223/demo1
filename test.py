@@ -13,11 +13,11 @@ def test():
     checkpoint=torch.load("checkpoint.pt") #手动填写
     model.load_state_dict(checkpoint['model'])
 
-    trainer=Trainer(model,optimizer=False,scheduler=False,patience=config.patience)
+    trainer=Trainer(model,optimizer=None,scheduler=None,patience=config.patience)
     test_loss,test_acc,test_report=trainer.dev(test_dataloader)
     print(f"测试损失: {test_loss:.4f}")
     print(f"测试准确率: {test_acc:.4f}")
     print(f"测试报告:\n{test_report}")
 
-if __name__=='__main':
+if __name__=="__main__":
     test()
