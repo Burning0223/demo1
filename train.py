@@ -3,16 +3,16 @@ from torch import nn
 import torch
 from sklearn.metrics import accuracy_score,classification_report
 from early_stopping import EarlyStopping
-import config
+import Bert_Config
 
-experiment_name=f"max_length:{config.max_length},num_epochs:{config.num_epochs},batch_size:{config.batch_size},learning_rate:{config.learning_rate}"
+experiment_name=f"max_length:{Bert_Config.max_length},num_epochs:{Bert_Config.num_epochs},batch_size:{Bert_Config.batch_size},learning_rate:{Bert_Config.learning_rate}"
 swanlab.init(project="Bert_text_classification",
              experiment_name=experiment_name,
              config={
-                "max_length":config.max_length,
-                "num_epochs":config.num_epochs,
-                "batch_size":config.batch_size,
-                "learning_rate":config.learning_rate
+                "max_length":Bert_Config.max_length,
+                "num_epochs":Bert_Config.num_epochs,
+                "batch_size":Bert_Config.batch_size,
+                "learning_rate":Bert_Config.learning_rate
              },
              mode="offline")
 id2label = {
@@ -82,7 +82,7 @@ class Trainer():
 
     def train_with_early_stopping(self,train_dataloader,dev_dataloader):
         dev_best_acc=0
-        for epoch in range(config.num_epochs):
+        for epoch in range(Bert_Config.num_epochs):
             print(f"Epoch {epoch+1}")
             train_loss,train_acc=self.train(train_dataloader)
             dev_loss,dev_acc,dev_report=self.dev(dev_dataloader)
