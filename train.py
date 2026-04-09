@@ -15,19 +15,14 @@ swanlab.init(project="Bert_text_classification",
                 "learning_rate":Bert_Config.learning_rate
              },
              mode="offline")
-id2label = {
-    0: 100,1: 101,2: 102,3: 103,4: 104,
-    5: 106,6: 107,7: 108,8: 109,9: 110,
-    10: 112,11: 113,12: 114,13: 115,
-    14: 116
-}
 
 class Trainer():
-    def __init__(self,model,optimizer,scheduler,patience):
+    def __init__(self,model,optimizer,scheduler,patience,id2label):
         self.model=model
         self.optimizer=optimizer
         self.scheduler=scheduler
         self.early_stopping=EarlyStopping(patience=patience,verbose=True)
+        self.id2label=id2label
 
     def train(self,dataloader):
         self.model.train()
@@ -47,12 +42,10 @@ class Trainer():
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
-            try:
-                all_labels.extend(id2label[label.item()] for label in labels.numpy())
-                all_preds.extend(id2label[pred.item()] for pred in preds.numpy())
-            except KeyError as e:
-                print(f"标签匹配错误：{e}")
-                continue
+            for label in labels.numpy():
+                all_labels.append(self.id2label.get(label,"Unk"))
+            for pred in preds.numpy():
+                all_preds.append(self.id2label.get(pred,"Unk"))
         ave_loss=total_loss/len(dataloader)
         acc=accuracy_score(all_labels,all_preds)
         return ave_loss,acc
@@ -72,10 +65,11 @@ class Trainer():
                 loss=nn.CrossEntropyLoss()(output, labels)
                 preds=torch.argmax(output,dim=1)
                 total_loss+=loss.item()
-                
-                all_labels.extend( id2label[label.item()] for label in labels.numpy())
-                all_preds.extend(id2label[pred.item()] for pred in preds.numpy())
-        ave_loss=total_loss/len(dataloader)
+                for label in labels.numpy():
+                    all_labels.append(self.id2label.get(label,"Unk"))
+                for pred in preds.numpy():
+                    all_preds.append(self.id2label.get(pred,"Unk"))
+                ave_loss=total_loss/len(dataloader)
         acc=accuracy_score(all_labels,all_preds)
         report=classification_report(all_labels,all_preds)
         return ave_loss,acc,report

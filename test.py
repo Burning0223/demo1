@@ -12,8 +12,8 @@ def test():
 
     test_dataset=TextClassificationDataset(data_path=data_path,dataset_type="test",config=config)
     test_dataloader=DataLoader(test_dataset,batch_size,shuffle=False,collate_fn=test_dataset.collate_fn)
-
-    model=BertClassifier()
+    num_classes=test_dataset.num_classes
+    model=BertClassifier(config,num_classes)
     checkpoint=torch.load("checkpoint.pt") #手动填写
     model.load_state_dict(checkpoint['model'])
 

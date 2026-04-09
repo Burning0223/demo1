@@ -2,12 +2,14 @@ import torch
 from torch.utils.data import Dataset
 from transformers import BertTokenizer
 from sklearn.model_selection import train_test_split
+import json
 
 
 class TextClassificationDataset(Dataset):
     def __init__(self,data_path,dataset_type,config):
         super().__init__()
-        self.texts,self.keywords,self.labels=self.load_data(data_path)
+        self.texts,self.keywords,self.labels,self.label2id,self.id2label=self.load_data(data_path)
+        self.num_classes=len(self.label2id)
         self.train_texts,self.train_keywords,self.train_labels,\
         self.dev_texts,self.dev_keywords,self.dev_labels,\
         self.test_texts,self.test_keywords,self.test_labels=self.data_split(
@@ -33,13 +35,7 @@ class TextClassificationDataset(Dataset):
         texts=[]
         labels=[]
         keywords=[]
-
-        labels2id={
-            100:0,101:1,102:2,103:3,104:4,106:5,
-            107:6,108:7,109:8,110:9,112:10,
-            113:11,114:12,115:13,116:14
-        }
-
+        label_set=set()
         with open(data_path,'r',encoding='utf-8') as f:
             for line in f:
                 parts=line.strip().split("_!_")
@@ -48,15 +44,39 @@ class TextClassificationDataset(Dataset):
                 text=parts[3]
                 keyword=parts[4]
 
+                label_set.add(label_code)
                 keyword=keyword.replace(","," ")
-
-                label=labels2id[label_code]
-
                 texts.append(text)
                 keywords.append(keyword)
+
+                if label_code in self.label2id:
+                    label=self.label2id[label_code]
+                else:
+                    print(f"警告：标签{label_code}未在label2id中找到,默认为-1")
+                    label=-1
                 labels.append(label)
 
-        return texts,keywords,labels
+            label2id={label:id for id,label in enumerate(sorted(label_set))}
+            id2label={id:label for label,id in label2id.items()}
+            mappings={
+                    "label2id":label2id,
+                    "id2label":id2label
+                }
+            with open("label_mapping.json",'w',encoding="utf-8") as f:
+                json.dump(mappings,f,ensure_ascii=False,indent=4)
+
+        return texts,keywords,labels,label2id,id2label
+    
+    def mappings_load(self):
+        try:
+            with open("label_mapping.json",'r',encoding="utf-8") as f:
+                mapppings=json.load(f)
+            return mapppings['label2id'],mapppings['id2label']
+        except FileNotFoundError:
+            print("警告：未找到标签映射文件")
+            return {},{}
+
+
     
     def data_split(self,texts,keywords,labels):
         x_train,x_temp,y_train,y_temp=train_test_split(
