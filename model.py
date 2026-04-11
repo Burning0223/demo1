@@ -10,8 +10,8 @@ class BertClassifier(nn.Module):
         self.Dropout=nn.Dropout(self.config.dropout)
         self.fc=nn.Linear(self.bert.config.hidden_size,self.num_classes)
 
-    def forward(self,batch):
-        outputs=self.bert(**batch)
+    def forward(self,input_ids,attention_mask,token_type_ids):
+        outputs=self.bert(input_ids=input_ids,attention_mask=attention_mask,token_type_ids=token_type_ids)
         pooled_output=outputs.pooler_output
         x=self.Dropout(pooled_output)
         logits=self.fc(x)
