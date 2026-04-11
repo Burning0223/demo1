@@ -9,3 +9,5 @@ __pycache__/
 swanlog/
 
 bert-base-chinese/
+
+label_mapping.json
