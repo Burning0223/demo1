@@ -1,34 +1,38 @@
 import swanlab
 from torch import nn
 import torch
-from sklearn.metrics import accuracy_score,classification_report
-from early_stopping import EarlyStopping
-import Bert_Config
+from Bert_Config import Metrics,EarlyStopping
 
-experiment_name=f"max_length:{Bert_Config.max_length},num_epochs:{Bert_Config.num_epochs},batch_size:{Bert_Config.batch_size},learning_rate:{Bert_Config.learning_rate}"
-swanlab.init(project="Bert_text_classification",
-             experiment_name=experiment_name,
-             config={
-                "max_length":Bert_Config.max_length,
-                "num_epochs":Bert_Config.num_epochs,
-                "batch_size":Bert_Config.batch_size,
-                "learning_rate":Bert_Config.learning_rate
-             },
-             mode="offline")
+
 
 class Trainer():
-    def __init__(self,model,optimizer,scheduler,patience,id2label):
+    def __init__(self,model,optimizer,scheduler,patience,id2label,config):
         self.model=model
         self.optimizer=optimizer
         self.scheduler=scheduler
         self.early_stopping=EarlyStopping(patience=patience,verbose=True)
         self.id2label=id2label
+        self.max_length=config.get("max_length",128)
+        self.num_epochs=config.get("num_epochs",10)
+        self.batch_size=config.get("batch_size",16)
+        self.learning_rate=config.get("learning_rate",2e-5)
+
+
+        experiment_name=f"max_length:{self.max_length},num_epochs:{self.nfig.num_epochs},batch_size:{self.batch_size},learning_rate:{self.learning_rate}"
+        swanlab.init(project="Bert_text_classification",
+             experiment_name=experiment_name,
+             config={
+                "max_length":self.max_length,
+                "num_epochs":self.num_epochs,
+                "batch_size":self.batch_size,
+                "learning_rate":self.learning_rate
+             },
+             mode="offline")
 
     def train(self,dataloader):
         self.model.train()
         total_loss=0.0
-        all_labels=[]
-        all_preds=[]
+
         for batch in dataloader:
             self.optimizer.zero_grad()
             input_ids=batch['input_ids']
@@ -42,19 +46,16 @@ class Trainer():
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
-            for label in labels.numpy():
-                all_labels.append(self.id2label.get(label,"Unk"))
-            for pred in preds.numpy():
-                all_preds.append(self.id2label.get(pred,"Unk"))
+           
         ave_loss=total_loss/len(dataloader)
-        acc=accuracy_score(all_labels,all_preds)
-        return ave_loss,acc
+        train_metrics=Metrics(labels,preds)
+        train_acc=train_metrics.acc
+        return ave_loss,train_acc
     
     def dev(self,dataloader):
         self.model.eval()
         total_loss=0.0
-        all_labels=[]
-        all_preds=[]
+        
         with torch.no_grad():
             for batch in dataloader:
                 input_ids=batch['input_ids']
@@ -65,18 +66,15 @@ class Trainer():
                 loss=nn.CrossEntropyLoss()(output, labels)
                 preds=torch.argmax(output,dim=1)
                 total_loss+=loss.item()
-                for label in labels.numpy():
-                    all_labels.append(self.id2label.get(label,"Unk"))
-                for pred in preds.numpy():
-                    all_preds.append(self.id2label.get(pred,"Unk"))
-                ave_loss=total_loss/len(dataloader)
-        acc=accuracy_score(all_labels,all_preds)
-        report=classification_report(all_labels,all_preds)
-        return ave_loss,acc,report
+        ave_loss=total_loss/len(dataloader)
+        dev_metrics=Metrics(labels,preds)
+        dev_acc=dev_metrics.acc
+        dev_report=dev_metrics.report
+        return ave_loss,dev_acc,dev_report
 
     def train_with_early_stopping(self,train_dataloader,dev_dataloader):
         dev_best_acc=0
-        for epoch in range(Bert_Config.num_epochs):
+        for epoch in range(self.num_epochs):
             print(f"Epoch {epoch+1}")
             train_loss,train_acc=self.train(train_dataloader)
             dev_loss,dev_acc,dev_report=self.dev(dev_dataloader)
