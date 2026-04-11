@@ -35,11 +35,8 @@ class Trainer():
 
         for batch in dataloader:
             self.optimizer.zero_grad()
-            input_ids=batch['input_ids']
-            attention_mask=batch['attention_mask']
-            token_type_ids=batch['token_type_ids']
             labels=batch['labels']
-            output=self.model(input_ids,attention_mask,token_type_ids)
+            output=self.model(batch)
             preds=torch.argmax(output,dim=1)
             loss=nn.CrossEntropyLoss()(output, labels)
             total_loss+=loss.item()
@@ -59,11 +56,8 @@ class Trainer():
         
         with torch.no_grad():
             for batch in dataloader:
-                input_ids=batch['input_ids']
-                attention_mask=batch['attention_mask']
-                token_type_ids=batch['token_type_ids']
+                output=self.model(batch)
                 labels=batch['labels']
-                output=self.model(input_ids,attention_mask,token_type_ids)
                 loss=nn.CrossEntropyLoss()(output, labels)
                 preds=torch.argmax(output,dim=1)
                 total_loss+=loss.item()
