@@ -8,5 +8,6 @@
     "data_path":"../0.demo1文本分类/toutiao_cat_data.txt",
     "dropout":0.1,
     "test_size":0.15,
-    "dev_size":0.15
+    "dev_size":0.15,
+    "random":42
 }

@@ -6,9 +6,10 @@ import json
 
 
 class TextClassificationDataset(Dataset):
-    def __init__(self,data_path,dataset_type,config):
+    def __init__(self,dataset_type,config):
         super().__init__()
-        self.texts,self.keywords,self.labels,self.label2id,self.id2label=self.load_data(data_path)
+        self.config=config
+        self.texts,self.keywords,self.labels,self.label2id,self.id2label=self.load_data(self.config.data_path)
         self.num_classes=len(self.label2id)
         self.train_texts,self.train_keywords,self.train_labels,\
         self.dev_texts,self.dev_keywords,self.dev_labels,\
@@ -25,18 +26,15 @@ class TextClassificationDataset(Dataset):
         else:
             print("dataset_type无效")
         
-        self.tokenizer=BertTokenizer.from_pretrained(config.get("model_path","../bert-base-uncased"))
-        self.max_length=config.get("max_length",128)
-        self.test_size=config.get("test_size",0.15)
-        self.dev_size=config.get("dev_size",0.15)
-        self.random=config.get("random",42)
-    def load_data(self,data_path):
+        self.tokenizer=BertTokenizer.from_pretrained(config.model_path)
+        
+    def load_data(self):
     
         texts=[]
         labels=[]
         keywords=[]
         label_set=set()
-        with open(data_path,'r',encoding='utf-8') as f:
+        with open(self.config.data_path,'r',encoding='utf-8') as f:
             for line in f:
                 parts=line.strip().split("_!_")
 
@@ -80,10 +78,10 @@ class TextClassificationDataset(Dataset):
     
     def data_split(self,texts,keywords,labels):
         x_train,x_temp,y_train,y_temp=train_test_split(
-            texts,labels,test_size=self.test_size+self.dev_size,random_state=self.random,stratify=labels
+            texts,labels,test_size=self.config.test_size+self.config.dev_size,random_state=self.config.random,stratify=labels
         )
         x_dev,x_test,y_dev,y_test=train_test_split(
-            x_temp,y_temp,test_size=0.5,random_state=self.random,stratify=y_temp
+            x_temp,y_temp,test_size=0.5,random_state=self.config.random,stratify=y_temp
         )
         keywords_train=keywords[:len(x_train)]
         keywords_dev=keywords[len(x_train):len(x_train)+len(x_dev)]
@@ -101,7 +99,7 @@ class TextClassificationDataset(Dataset):
 
     def collate_fn(self,batch):
         texts,keywords,labels=zip(*batch)
-        encoding=self.tokenizer(list(texts),list(keywords),return_tensors='pt',max_length=self.max_length,
+        encoding=self.tokenizer(list(texts),list(keywords),return_tensors='pt',max_length=self.config.max_length,
                             padding=True,truncation=True)
         return {
                 'input_ids':encoding['input_ids'],

@@ -6,7 +6,17 @@ class Cls_Config:
     def __init__(self,config_file):
         self.config_file=config_file
         self.config=self.load_config()
-
+        self.model_path=self.config.get("model_path","../bert-base-uncased")
+        self.max_length=self.config.get("max_length",128)
+        self.num_epochs=self.config.get("num_epochs",10)
+        self.batch_size=self.config.get("batch_size",16)
+        self.learning_rate=self.config.get("learning_rate",2e-5)
+        self.patience=self.config.get("patience",2)
+        self.data_path=self.config.get("data_path","../0.demo1文本分类/toutiao_cat_data.txt")
+        self.dropout=self.config.get("dropout",0.1)
+        self.test_size=self.config.get("test_size",0.15)
+        self.dev_size=self.config.get("dev_size",0.15)
+        self.random=self.config.get("random",42)
     def load_config(self):
         with open(self.config_file,'r', encoding='utf-8') as f:
             return json.load(f)
