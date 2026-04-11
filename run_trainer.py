@@ -8,6 +8,7 @@ from transformers import get_linear_schedule_with_warmup
 from data_process import TextClassificationDataset
 from model import BertClassifier
 from torch.utils.data import DataLoader
+import os
 
 def random_seed(seed):
     random .seed(seed)
@@ -21,12 +22,11 @@ class Trainer():
         self.config=config
         self.optimizer=optimizer
         self.scheduler=scheduler
-        self.early_stopping=EarlyStopping(patience=self.config.patience,verbose=True)
+        self.early_stopping=EarlyStopping(self.config,patience=self.config.patience,verbose=True)
         self.id2label=id2label
 
-        experiment_name=f"max_length:{self.config.max_length},num_epochs:{self.config.num_epochs},batch_size:{self.config.batch_size},learning_rate:{self.config.learning_rate}"
         swanlab.init(project="Bert_text_classification",
-             experiment_name=experiment_name,
+             experiment_name=self.early_stopping.experiment_name,
              config={
                 "max_length":self.config.max_length,
                 "num_epochs":self.config.num_epochs,

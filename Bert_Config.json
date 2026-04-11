@@ -1,13 +1,14 @@
 {
     "model_path":"../bert-base-uncased",
     "max_length":128,
-    "num_epochs":10,
+    "num_epochs":5,
     "batch_size":16,
     "learning_rate":2e-5,
     "patience":2,
-    "data_path":"../0.demo1文本分类/toutiao_cat_data.txt",
+    "data_path":"../0.demo1文本分类/dev_1k.txt",
     "dropout":0.1,
     "test_size":0.15,
     "dev_size":0.15,
-    "random":42
+    "random":42,
+    "delta":0
 }
