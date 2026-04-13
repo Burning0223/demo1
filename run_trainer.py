@@ -21,7 +21,7 @@ class Trainer():
         self.config=config
         self.optimizer=optimizer
         self.scheduler=scheduler
-        self.early_stopping=EarlyStopping(self.config)
+        self.early_stopping=EarlyStopping(self.config,verbose=True)
         self.id2label=id2label
 
         swanlab.init(project="Bert_text_classification",
@@ -57,8 +57,7 @@ class Trainer():
         ave_loss=total_loss/len(dataloader)
         train_metrics=Metrics(all_labels,all_preds,self.id2label,self.config)
         train_acc=train_metrics.acc
-        train_support=train_metrics.support
-        return ave_loss,train_acc,train_support
+        return ave_loss,train_acc
     
     def dev(self,dataloader):
         self.model.eval()
@@ -87,12 +86,11 @@ class Trainer():
         dev_best_acc=0
         for epoch in range(self.config.num_epochs):
             print(f"Epoch {epoch+1}")
-            train_loss,train_acc,train_support=self.train(train_dataloader)
+            train_loss,train_acc=self.train(train_dataloader)
             dev_loss,dev_acc,dev_report=self.dev(dev_dataloader)
         
             print(f"训练损失:{train_loss:.4f}")
             print(f"训练准确率:{train_acc:.4f}")
-            print(f"训练集各分类样本数量：{train_support}")
             print(f"验证损失:{dev_loss:.4f}")
             print(f"验证准确率:{dev_acc:.4f}")
             
@@ -122,12 +120,11 @@ def main():
     dev_dataset=TextClassificationDataset(dataset_type="dev",config=config)
 
     id2label=train_dataset.id2label
-    num_classes=train_dataset.num_classes
 
     train_dataloader=DataLoader(train_dataset,config.batch_size,shuffle=True,collate_fn=train_dataset.collate_fn)
     dev_dataloader=DataLoader(dev_dataset,config.batch_size,shuffle=False,collate_fn=dev_dataset.collate_fn)
    
-    model=BertClassifier(config,num_classes)
+    model=BertClassifier(config)
 
     optimizer=torch.optim.AdamW(
         model.parameters(),lr=config.learning_rate
