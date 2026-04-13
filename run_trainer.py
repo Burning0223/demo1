@@ -41,11 +41,7 @@ class Trainer():
         all_preds=[]
         for batch in dataloader:
             self.optimizer.zero_grad()
-            input_ids=batch['input_ids']
-            attention_mask=batch['attention_mask']
-            token_type_ids=batch['token_type_ids']
-            labels=batch['labels']
-            output=self.model(input_ids,attention_mask,token_type_ids)
+            output,labels=self.model(**batch)
             preds=torch.argmax(output,dim=1)
             all_labels.extend(labels.numpy())
             all_preds.extend(preds.numpy())
@@ -79,16 +75,14 @@ class Trainer():
         ave_loss=total_loss/len(dataloader)
         dev_metrics=Metrics(all_labels,all_preds,self.id2label,self.config)
         dev_acc=dev_metrics.acc
-        dev_report=dev_metrics.report
-        return ave_loss,dev_acc,dev_report
+        return ave_loss,dev_acc
 
     def train_with_early_stopping(self,train_dataloader,dev_dataloader):
         dev_best_acc=0
         for epoch in range(self.config.num_epochs):
             print(f"Epoch {epoch+1}")
             train_loss,train_acc=self.train(train_dataloader)
-            dev_loss,dev_acc,dev_report=self.dev(dev_dataloader)
-        
+            dev_loss,dev_acc=self.dev(dev_dataloader)
             print(f"训练损失:{train_loss:.4f}")
             print(f"训练准确率:{train_acc:.4f}")
             print(f"验证损失:{dev_loss:.4f}")
