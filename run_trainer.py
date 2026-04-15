@@ -23,6 +23,7 @@ class Trainer():
         self.scheduler=scheduler
         self.early_stopping=EarlyStopping(self.config,verbose=True)
         self.id2label=id2label
+        self.loss_fn=nn.CrossEntropyLoss()
 
         swanlab.init(project="Bert_text_classification",
              experiment_name=self.early_stopping.experiment_name,
@@ -45,7 +46,7 @@ class Trainer():
             preds=torch.argmax(output,dim=1)
             all_labels.extend(labels.numpy())
             all_preds.extend(preds.numpy())
-            loss=nn.CrossEntropyLoss()(output, labels)
+            loss=self.loss_fn(output, labels)
             total_loss+=loss.item()
             loss.backward()
             self.optimizer.step()
@@ -62,12 +63,8 @@ class Trainer():
         all_preds=[]
         with torch.no_grad():
             for batch in dataloader:
-                input_ids=batch['input_ids']
-                attention_mask=batch['attention_mask']
-                token_type_ids=batch['token_type_ids']
-                labels=batch['labels']
-                output=self.model(input_ids,attention_mask,token_type_ids)
-                loss=nn.CrossEntropyLoss()(output, labels)
+                output,labels=self.model(**batch)
+                loss=nn.self.loss_fn(output, labels)
                 preds=torch.argmax(output,dim=1)
                 all_labels.extend(labels.numpy())
                 all_preds.extend(preds.numpy())
