@@ -107,8 +107,8 @@ def main():
     config=Cls_Config("Bert_Config.json")
     random_seed(config.random)
 
-    train_dataset=TextClassificationDataset(dataset_type="train",config=config)
-    dev_dataset=TextClassificationDataset(dataset_type="dev",config=config)
+    train_dataset=TextClassificationDataset(config=config,dataset_type="train")
+    dev_dataset=TextClassificationDataset(config=config,dataset_type="dev")
 
     id2label=train_dataset.id2label
 
