@@ -1,7 +1,6 @@
 import os
 import json
 import torch
-from collections import Counter
 
 class Cls_Config:
     def __init__(self,config_path="Bert_Config.json"):
@@ -70,7 +69,7 @@ class EarlyStopping:
         print(f"保存epoch{epoch+1}的checkpoint:{checkpoint_path}")
         if acc==self.dev_best_acc:
             self.best_model_path=checkpoint_path
-            print(f"保存最佳模型：{checkpoint_path}")
+            print(f"保存最佳模型：{self.best_model_path}")
 
 class Metrics:
     def __init__(self,true_labels,pred_labels,id2label,config):
