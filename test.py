@@ -7,7 +7,7 @@ from data_process import TextClassificationDataset
 from torch.utils.data import DataLoader
 def test():
     config=Cls_Config("Bert_Config.json")
-    test_dataset=TextClassificationDataset(dataset_type="test",config=config)
+    test_dataset=TextClassificationDataset(config=config,dataset_type="test")
     test_dataloader=DataLoader(test_dataset,config.batch_size,shuffle=False,collate_fn=test_dataset.collate_fn)
     id2label=test_dataset.id2label
     model=BertClassifier(config)

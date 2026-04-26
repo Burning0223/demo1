@@ -103,8 +103,8 @@ class Trainer():
             
         print(f"模型最优准确率为：{dev_best_acc}")
     
-def main():
-    config=Cls_Config("Bert_Config.json")
+def main(config_path="Bert_Config.json"):
+    config=Cls_Config(config_path)
     random_seed(config.random)
 
     train_dataset=TextClassificationDataset(config=config,dataset_type="train")
@@ -127,4 +127,5 @@ def main():
     trainer.train_with_early_stopping(train_dataloader,dev_dataloader)
     
 if __name__=="__main__":
-    main()
+    config_path="Bert_Config/Bert_Config_exp1.json"
+    main(config_path)
