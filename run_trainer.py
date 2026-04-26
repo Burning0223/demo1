@@ -121,7 +121,8 @@ def main(config_path="Bert_Config.json"):
         model.parameters(),lr=config.learning_rate
     )
     total_steps = len(train_dataloader) * config.num_epochs
-    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=total_steps)
+    num_warmup_steps = int(total_steps * 0.1)
+    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=total_steps)
     
     trainer=Trainer(model,config,id2label,optimizer,scheduler)
     trainer.train_with_early_stopping(train_dataloader,dev_dataloader)
