@@ -11,5 +11,6 @@
     "test_size":0.15,
     "dev_size":0.15,
     "random":42,
-    "delta":0
+    "delta":0,
+    "use_keyword":true
 }

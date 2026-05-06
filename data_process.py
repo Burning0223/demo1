@@ -55,9 +55,13 @@ class TextClassificationDataset(Dataset):
 
     def collate_fn(self,batch):
         texts,keywords,labels=zip(*batch)
-        encoding=self.tokenizer([str(text) for text in texts],[str(keyword) for keyword in keywords],
-                                return_tensors='pt',max_length=self.config.max_length,
-                                padding=True,truncation=True)
+        if self.config.use_keyword:
+            encoding=self.tokenizer([str(text) for text in texts],[str(keyword) for keyword in keywords],
+                                    return_tensors='pt',max_length=self.config.max_length,
+                                    padding=True,truncation=True)
+        else:
+            encoding=self.tokenizer([str(text) for text in texts],return_tensors='pt',
+                                    max_length=self.config.max_length,padding=True,truncation=True)
         return {
                 'input_ids':encoding['input_ids'],
                 'attention_mask':encoding['attention_mask'],
