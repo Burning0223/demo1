@@ -134,5 +134,5 @@ def main(config_path="Bert_Config.json"):
     trainer.train_with_early_stopping(train_dataloader,dev_dataloader)
     
 if __name__=="__main__":
-    config_path="Bert_Config/Bert_Config_exp1.json"
+    config_path="config_exp/config_exp1.json"
     main(config_path)
